@@ -3,7 +3,7 @@ plugins {
     `java-library`
 }
 
-group = ""
+group = "ru.nsu"
 version = "1.0-SNAPSHOT"
 
 repositories {
