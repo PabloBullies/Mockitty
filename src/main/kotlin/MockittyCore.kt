@@ -2,7 +2,7 @@ class MockittyCore {
     private var createdObject = ArrayList<String>()
     fun <T> mock(classToMock: Class<T>): T {
         //TODO: mock
-        return ArrayList<String>() as T
+        return createdObject as T
     }
 
     fun every(block: Any) {
