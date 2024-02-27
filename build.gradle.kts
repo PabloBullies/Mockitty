@@ -1,9 +1,9 @@
 plugins {
     kotlin("jvm") version "1.9.0"
-    application
+    `java-library`
 }
 
-group = "ru.nsu"
+group = ""
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
 }
 
@@ -20,8 +21,4 @@ tasks.test {
 
 kotlin {
     jvmToolchain(8)
-}
-
-application {
-    mainClass.set("MainKt")
 }
