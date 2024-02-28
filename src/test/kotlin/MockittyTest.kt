@@ -7,8 +7,8 @@ class MockittyTest {
 
     @Test
     fun testMock() {
-        val list = Mockitty.mock<ArrayList<String>>()
-        assertEquals(true, list.isEmpty())
+        val user = Mockitty.mock<User>()
+        user.hello()
     }
     @Test
     fun testEveryReturns(){

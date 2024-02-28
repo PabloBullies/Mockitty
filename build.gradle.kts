@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("net.bytebuddy:byte-buddy:1.14.12")
     testImplementation(kotlin("test"))
 }
 
