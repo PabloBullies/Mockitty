@@ -9,6 +9,7 @@ class MockittyTest {
     fun testMock() {
         val user = Mockitty.mock<User>()
         user.hello()
+        println(user.add(2, 3))
     }
     @Test
     fun testEveryReturns(){

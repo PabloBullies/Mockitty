@@ -1,3 +1,5 @@
+import core.MockittyCore
+
 class Mockitty {
     companion object {
         val MOCKITTY_CORE = MockittyCore()

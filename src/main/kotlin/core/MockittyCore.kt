@@ -1,22 +1,27 @@
+package core
+
 import net.bytebuddy.ByteBuddy
+import net.bytebuddy.agent.ByteBuddyAgent
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
 import net.bytebuddy.implementation.FixedValue
 import net.bytebuddy.matcher.ElementMatchers
-import net.bytebuddy.matcher.ElementMatchers.any
+import org.objenesis.ObjenesisStd
 
 
 class MockittyCore {
     private var createdObject = ArrayList<String>()
     fun <T> mock(classToMock: Class<T>): T {
+        ByteBuddyAgent.install()
         val mock = ByteBuddy()
             .subclass(classToMock)
             .method(ElementMatchers.returns(Any::class.java))
             .intercept(FixedValue.nullValue())
             .make()
-            .load(javaClass.getClassLoader())
+            .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
             .loaded
-            .getDeclaredConstructor()
-            .newInstance();
-        return mock as T
+        val objenesis = ObjenesisStd()
+        val result: T = objenesis.newInstance(mock)
+        return result
     }
 
     fun every(block: Any) {
