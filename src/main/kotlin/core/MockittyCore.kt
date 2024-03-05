@@ -3,8 +3,8 @@ package core
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.ByteBuddyAgent
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
-import net.bytebuddy.implementation.FixedValue
-import net.bytebuddy.matcher.ElementMatchers
+import net.bytebuddy.implementation.MethodDelegation
+import net.bytebuddy.matcher.ElementMatchers.any
 import org.objenesis.ObjenesisStd
 
 
@@ -14,8 +14,8 @@ class MockittyCore {
         ByteBuddyAgent.install()
         val mock = ByteBuddy()
             .subclass(classToMock)
-            .method(ElementMatchers.returns(Any::class.java))
-            .intercept(FixedValue.nullValue())
+            .method(any())
+            .intercept(MethodDelegation.to(Interceptor::class.java))
             .make()
             .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
             .loaded
