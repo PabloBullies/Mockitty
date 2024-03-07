@@ -15,6 +15,8 @@ dependencies {
     implementation("net.bytebuddy:byte-buddy:1.14.12")
     implementation("net.bytebuddy:byte-buddy-agent:1.14.12")
     implementation("org.objenesis:objenesis:3.3")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
+    testImplementation ("ch.qos.logback:logback-classic:1.3.5")
     testImplementation(kotlin("test"))
 }
 
