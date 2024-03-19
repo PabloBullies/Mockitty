@@ -13,6 +13,7 @@ class Interceptor {
     companion object {
 
         private val logger = KotlinLogging.logger {}
+
         @RuntimeType
         @JvmStatic
         fun intercept(
@@ -22,12 +23,14 @@ class Interceptor {
         ): Any? {
             MockInfoBase.getInstance().logInvocation(MethodInvocation(mock, invokedMethod, arguments))
             val rules: List<Rule<Any>> = MockInfoBase.getInstance().getRules(mock, invokedMethod)
-            logger.debug {"${invokedMethod.name}(...)\n" +
-                    "Rules: ${rules.toString()}"}
-            for (rule in rules){
-                if (rule.isConditionMet(arguments)) {
-                    logger.debug {"Rule applied - returned ${rule.result.invoke()}"}
-                    return rule.result.invoke()
+            logger.debug {
+                "${invokedMethod.name}(...)\n" +
+                        "Rules: $rules"
+            }
+            for (rule in rules) {
+                if (rule.apply(arguments)) {
+                    logger.debug { "Rule applied - returned ${rule.result()}" }
+                    return rule.result()
                 }
             }
             return getDefaultValue(invokedMethod.returnType)

@@ -6,9 +6,11 @@ class Mockitty {
         inline fun <reified T> mock(): T {
             return MOCKITTY_CORE.mock(T::class.java)
         }
+
         fun <T> every(block: () -> T): Term.TermBuilder<T> {
             return Term.builder<T>().every(block)
         }
+
         infix fun <T> Term.TermBuilder<T>.returns(block: () -> T) {
             this.returnsBlock = block
             val term: Term<T> = this.build()

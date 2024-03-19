@@ -9,7 +9,6 @@ import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers.any
 import org.objenesis.ObjenesisStd
-import java.util.stream.IntStream.range
 
 
 class MockittyCore {
@@ -27,42 +26,32 @@ class MockittyCore {
         val result: T = objenesis.newInstance(mock)
         return result
     }
+
     fun <T> makeRule(term: Term<T>) {
         logger.debug { "Start: everyBlock" }
         MockInfoBase.getInstance().clearMatchers()
-        term.everyBlock.invoke()
-
+        term.everyBlock()
         logger.debug { "End: everyBlock. Getting invocation" }
         val invocation = MockInfoBase.getInstance().getLastInvocation()
         var matchers: List<(Any?) -> Boolean> = MockInfoBase.getInstance().getMatchers()
 
-        if ((matchers.isNotEmpty()) and (matchers.size != invocation.arguments.size)){
+        if ((matchers.isNotEmpty()) and (matchers.size != invocation.arguments.size)) {
             throw IllegalArgumentException("Matcher length must be equal arguments length or 0")
         }
-        if (matchers.isEmpty()){
+        if (matchers.isEmpty()) {
             val argMatchers: ArrayList<(Any?) -> Boolean> = ArrayList()
-            for (argument in invocation.arguments){
-                argMatchers.add {it == argument}
+            for (argument in invocation.arguments) {
+                argMatchers.add { it == argument }
             }
             matchers = argMatchers
         }
-        logger.debug { "Invocation getted: ${invocation.invokedMethod.name}" +
-                "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})\n" +
-                "Matchers: $matchers" }
+        logger.debug {
+            "Invocation getted: ${invocation.invokedMethod.name}" +
+                    "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})\n" +
+                    "Matchers: $matchers"
+        }
 
-        val rule = Rule(
-            {arguments ->
-                var result: Boolean = true
-                for (i: Int in range(0, arguments.size)){
-                    val matchingResult = matchers[i](arguments[i])
-                    logger.debug { "arg $i: $matchingResult"}
-                    result = result and matchingResult
-                    if (!result) break
-                }
-                logger.debug { "result: $result "}
-                result
-        }, term.returnsBlock)
-
+        val rule = Rule( matchers, term.returnsBlock)
         MockInfoBase.getInstance().addRule(invocation.mock, invocation.invokedMethod, rule)
     }
 
