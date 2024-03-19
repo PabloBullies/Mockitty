@@ -47,7 +47,7 @@ class MockittyCore {
             matchers = argMatchers
         }
         logger.debug { "Invocation getted: ${invocation.invokedMethod.name}" +
-                "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})" +
+                "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})\n" +
                 "Matchers: $matchers" }
 
         val rule = Rule(
@@ -55,9 +55,11 @@ class MockittyCore {
                 var result: Boolean = true
                 for (i: Int in range(0, arguments.size)){
                     val matchingResult = matchers[i](arguments[i])
-                    logger.debug { "arg: $arguments[i] "}
+                    logger.debug { "arg $i: $matchingResult"}
                     result = result and matchingResult
+                    if (!result) break
                 }
+                logger.debug { "result: $result "}
                 result
         }, term.returnsBlock)
 

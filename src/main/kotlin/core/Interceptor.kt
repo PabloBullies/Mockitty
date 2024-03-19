@@ -22,7 +22,8 @@ class Interceptor {
         ): Any? {
             MockInfoBase.getInstance().logInvocation(MethodInvocation(mock, invokedMethod, arguments))
             val rules: List<Rule<Any>> = MockInfoBase.getInstance().getRules(mock, invokedMethod)
-            logger.debug {"${invokedMethod.name}(...) - ${rules.toString()}"}
+            logger.debug {"${invokedMethod.name}(...)\n" +
+                    "Rules: ${rules.toString()}"}
             for (rule in rules){
                 if (rule.isConditionMet(arguments)) {
                     logger.debug {"Rule applied - returned ${rule.result.invoke()}"}

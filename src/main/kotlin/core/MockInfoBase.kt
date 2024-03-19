@@ -55,7 +55,7 @@ class MockInfoBase{
     }
     @Suppress("UNCHECKED_CAST")
     fun <T> logMatcher(matcherFunction: (T?) -> Boolean) {
-        (matchersInvocationContainer as LinkedBlockingDeque<(T?) -> Boolean>).addFirst(matcherFunction)
+        (matchersInvocationContainer as LinkedBlockingDeque<(T?) -> Boolean>).addLast(matcherFunction)
     }
     fun getMatchers(): List<(Any?) -> Boolean>{
         return matchersInvocationContainer.toList()
