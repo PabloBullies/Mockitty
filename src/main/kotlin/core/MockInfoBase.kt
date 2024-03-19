@@ -1,5 +1,6 @@
 package core
 
+import core.matching.Rule
 import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.LinkedBlockingDeque
@@ -8,6 +9,7 @@ class MockInfoBase{
 
     private val rulesContainer: IdentityHashMap<Any, HashMap<Method, LinkedList<Rule<Any>>>>  = IdentityHashMap()
     private val invocationContainer: LinkedBlockingDeque<MethodInvocation> = LinkedBlockingDeque()
+    private val matchersInvocationContainer: LinkedBlockingDeque<(Any?) -> Boolean> = LinkedBlockingDeque()
     companion object {
         @Volatile
         @JvmStatic
@@ -50,5 +52,15 @@ class MockInfoBase{
     @Throws(InterruptedException::class)
     fun getLastInvocation(): MethodInvocation {
         return invocationContainer.takeFirst()
+    }
+    @Suppress("UNCHECKED_CAST")
+    fun <T> logMatcher(matcherFunction: (T?) -> Boolean) {
+        (matchersInvocationContainer as LinkedBlockingDeque<(T?) -> Boolean>).addFirst(matcherFunction)
+    }
+    fun getMatchers(): List<(Any?) -> Boolean>{
+        return matchersInvocationContainer.toList()
+    }
+    fun clearMatchers(){
+        matchersInvocationContainer.clear()
     }
 }

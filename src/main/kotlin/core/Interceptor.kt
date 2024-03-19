@@ -1,5 +1,6 @@
 package core
 
+import core.matching.Rule
 import mu.KotlinLogging
 import net.bytebuddy.implementation.bind.annotation.AllArguments
 import net.bytebuddy.implementation.bind.annotation.Origin

@@ -15,7 +15,7 @@ class MockittyTest {
     fun testEveryReturns(){
         val list = Mockitty.mock<ArrayList<String>>()
         Mockitty.every { list.isEmpty() } returns { false }
-        list.add("1")
+        // list.add("1")
         assertEquals(false, list.isEmpty())
 
         Mockitty.every { list.hashCode() } returns { 2 }
@@ -28,8 +28,16 @@ class MockittyTest {
         Mockitty.every { user.add(1,1) } returns { 3 }
         assertEquals(3, user.add(1,1))
 
-        // переопределение родительских методов не работает?
-        // Mockitty.every { list.getOrNull(0) } returns { "hello" }
-        // assertEquals("hello", list.getOrNull(0))
+        // Matchers
+        Mockitty.every { list[0] } returns { "hello" }
+        assertEquals("hello", list[0])
+
+        Mockitty.every { list[any()] } returns { "any" }
+        Mockitty.every { list[eq(0)] } returns { "1" }
+        assertEquals( list[0],  "1" )
+        assertEquals( list[1],  "any" )
+
+        Mockitty.every { user.addFriend(any()) } returns { true }
+        assertEquals(user.addFriend(User("Borya")), true)
     }
 }

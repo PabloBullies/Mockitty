@@ -15,5 +15,4 @@ class Mockitty {
             MOCKITTY_CORE.makeRule(term)
         }
     }
-
 }
