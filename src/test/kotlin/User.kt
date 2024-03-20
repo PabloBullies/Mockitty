@@ -12,8 +12,9 @@ open class User (private val username: String){
     }
 
     companion object {
-        fun staticMethod() {
+        fun staticMethod() : String{
             println("STATIC")
+            return "STATIC"
         }
     }
 }

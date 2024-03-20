@@ -17,6 +17,7 @@ public class StaticInterceptor {
 
     @Advice.OnMethodExit
     private static void exit(
+            //@Advice.Enter
             @Advice.Origin Method invokedMethod,
             @Advice.AllArguments Object[] arguments,
             @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value
