@@ -5,9 +5,12 @@ import core.matching.Rule
 import mu.KotlinLogging
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.ByteBuddyAgent
+import net.bytebuddy.asm.Advice
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
+import net.bytebuddy.dynamic.loading.ClassReloadingStrategy
 import net.bytebuddy.implementation.MethodDelegation
 import net.bytebuddy.matcher.ElementMatchers.any
+import net.bytebuddy.matcher.ElementMatchers.named
 import org.objenesis.ObjenesisStd
 
 
@@ -26,7 +29,6 @@ class MockittyCore {
         val result: T = objenesis.newInstance(mock)
         return result
     }
-
     fun <T> makeRule(term: Term<T>) {
         logger.debug { "Start: everyBlock" }
         MockInfoBase.getInstance().clearMatchers()
@@ -53,6 +55,15 @@ class MockittyCore {
 
         val rule = Rule( matchers, term.returnsBlock)
         MockInfoBase.getInstance().addRule(invocation.mock, invocation.invokedMethod, rule)
+    }
+
+    fun <T> mockStaticMethod(targetClass: Class<T>, method: String) {
+        ByteBuddyAgent.install()
+        ByteBuddy()
+            .redefine(targetClass)
+            .visit(Advice.to(StaticInterceptor::class.java).on(named(method)))
+            .make()
+            .load(javaClass.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent())
     }
 
 }

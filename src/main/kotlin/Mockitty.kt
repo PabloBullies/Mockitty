@@ -7,6 +7,10 @@ class Mockitty {
             return MOCKITTY_CORE.mock(T::class.java)
         }
 
+        inline fun <reified T> staticMock(method: String) {
+            MOCKITTY_CORE.mockStaticMethod(T::class.java, method)
+        }
+
         fun <T> every(block: () -> T): Term.TermBuilder<T> {
             return Term.builder<T>().every(block)
         }

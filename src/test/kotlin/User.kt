@@ -10,4 +10,10 @@ open class User (private val username: String){
         friendList.add(friend)
         return friend.friendList.contains(this)
     }
+
+    companion object {
+        fun staticMethod() {
+            println("STATIC")
+        }
+    }
 }
