@@ -1,6 +1,7 @@
 package core
 
 import Term
+import core.matching.Rule
 import mu.KotlinLogging
 import net.bytebuddy.ByteBuddy
 import net.bytebuddy.agent.ByteBuddyAgent
@@ -25,24 +26,33 @@ class MockittyCore {
         val result: T = objenesis.newInstance(mock)
         return result
     }
+
     fun <T> makeRule(term: Term<T>) {
         logger.debug { "Start: everyBlock" }
-        term.everyBlock.invoke()
+        MockInfoBase.getInstance().clearMatchers()
+        term.everyBlock()
         logger.debug { "End: everyBlock. Getting invocation" }
-        lateinit var invocation: MethodInvocation
-        try {
-            invocation = MockInfoBase.getInstance().getLastInvocation()
-        }
-        catch (e: InterruptedException){
-            //TODO: что-то сделать с этим безобразием
-            println(e.message)
-        }
-        logger.debug { "Invocation getted: ${invocation.invokedMethod.name}" +
-                "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})" }
-        val rule = Rule({arguments -> invocation.arguments.contentEquals(arguments)}, term.returnsBlock)
+        val invocation = MockInfoBase.getInstance().getLastInvocation()
+        var matchers: List<(Any?) -> Boolean> = MockInfoBase.getInstance().getMatchers()
 
+        if ((matchers.isNotEmpty()) and (matchers.size != invocation.arguments.size)) {
+            throw IllegalArgumentException("Matcher length must be equal arguments length or 0")
+        }
+        if (matchers.isEmpty()) {
+            val argMatchers: ArrayList<(Any?) -> Boolean> = ArrayList()
+            for (argument in invocation.arguments) {
+                argMatchers.add { it == argument }
+            }
+            matchers = argMatchers
+        }
+        logger.debug {
+            "Invocation getted: ${invocation.invokedMethod.name}" +
+                    "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})\n" +
+                    "Matchers: $matchers"
+        }
+
+        val rule = Rule( matchers, term.returnsBlock)
         MockInfoBase.getInstance().addRule(invocation.mock, invocation.invokedMethod, rule)
-        //createdObject.add("1")
     }
 
 }
