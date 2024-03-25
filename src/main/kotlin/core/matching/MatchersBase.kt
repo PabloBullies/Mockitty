@@ -1,15 +1,9 @@
 package core.matching
 
 import Mockitty
-import core.MockInfoBase
+import core.data.MockInfoBase
+import core.getDefaultValue
 
-fun getDefaultValue(clazz: Class<*>): Any? {
-    return when (clazz.simpleName) {
-        "Boolean" -> false
-        "Byte", "Character", "Short", "Integer", "Long", "Float", "Double" -> 0
-        else -> null
-    }
-}
 
 inline fun <reified T> match(noinline matcherFunction: (T?) -> Boolean): T {
     MockInfoBase.getInstance().logMatcher(matcherFunction)

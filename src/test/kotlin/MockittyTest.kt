@@ -1,7 +1,7 @@
 import Mockitty.Companion.returns
-import core.MockittyCore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class MockittyTest {
 
@@ -15,23 +15,22 @@ class MockittyTest {
         assertEquals(2, list.hashCode())
 
         val user = Mockitty.mock<User>()
+        assertNull(user.getName())
         Mockitty.every { user.getName() } returns { "Jojo" }
         assertEquals("Jojo", user.getName())
 
-        Mockitty.every { user.add(1,1) } returns { 3 }
-        assertEquals(3, user.add(1,1))
-        assertEquals(0, user.add(2,2))
+        Mockitty.every { user.add(1, 1) } returns { 3 }
+        assertEquals(3, user.add(1, 1))
+        assertEquals(0, user.add(2, 2))
     }
 
     @Test
     fun testStatic() {
-        val core = MockittyCore()
-        core.mockStaticMethod(User.Companion::class.java, "staticMethod")
-        println(User.staticMethod())
-        //core.mockStaticMethod(User::class.java, "add")
-        //var user = User("a")
-        //println(user.add(1, 1))
-        //println(user.add(1, 1))
+        Mockitty.mock<User.Companion>("staticMethod")
+        assertNull(User.staticMethod())
+        Mockitty.every { User.staticMethod() } returns { "static" }
+        val value = User.staticMethod()
+        assertEquals(value, "static")
     }
 
     @Test

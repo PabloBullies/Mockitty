@@ -1,9 +1,16 @@
 package core;
 
+import core.data.MethodInvocation;
+import core.data.MockInfoBase;
+import core.matching.Rule;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+
+import static core.UtilsKt.getDefaultValue;
 
 public class StaticInterceptor {
 
@@ -22,8 +29,14 @@ public class StaticInterceptor {
             @Advice.AllArguments Object[] arguments,
             @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value
     ) {
-        System.out.println(value);
-        // Вот сюда писать
-        //value = что возвращаем
+        MockInfoBase.getInstance().logInvocation(new MethodInvocation(null, invokedMethod, arguments));
+        List<Rule<Object>> rules = MockInfoBase.getInstance().getRules().getRules(null, invokedMethod);
+        for (Rule<Object> rule : rules) {
+            if (rule.apply(Arrays.stream(arguments).toArray())) {
+                value = rule.getResult().invoke();
+                return;
+            }
+        }
+        value = getDefaultValue(invokedMethod.getReturnType());
     }
 }
