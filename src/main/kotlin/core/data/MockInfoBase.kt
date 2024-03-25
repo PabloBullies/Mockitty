@@ -1,13 +1,11 @@
-package core
+package core.data
 
-import core.matching.Rule
-import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.LinkedBlockingDeque
 
 class MockInfoBase {
 
-    private val rulesContainer: IdentityHashMap<Any, HashMap<Method, LinkedList<Rule<Any>>>> = IdentityHashMap()
+    val rules: RulesContainer = RulesContainer()
     private val invocationContainer: LinkedBlockingDeque<MethodInvocation> = LinkedBlockingDeque()
     private val matchersInvocationContainer: LinkedBlockingDeque<(Any?) -> Boolean> = LinkedBlockingDeque()
 
@@ -18,30 +16,11 @@ class MockInfoBase {
 
         @JvmStatic
         fun getInstance(): MockInfoBase {
-            if (this.INSTANCE == null) {
-                this.INSTANCE = MockInfoBase()
+            if (INSTANCE == null) {
+                INSTANCE = MockInfoBase()
             }
-            return this.INSTANCE!!
+            return INSTANCE!!
         }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T> addRule(mock: Any, method: Method, rule: Rule<T>) {
-        if (rulesContainer[mock] == null) rulesContainer[mock] = LinkedHashMap()
-        if (rulesContainer[mock]!![method] == null) rulesContainer[mock]!![method] = LinkedList()
-        (rulesContainer[mock]?.get(method) as LinkedList<Rule<T>>).addFirst(rule)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T> getRules(mock: Any, method: Method): List<Rule<T>> {
-        if (rulesContainer[mock] == null) {
-            return LinkedList()
-        }
-        if (rulesContainer[mock] == null ||
-            rulesContainer[mock]!![method] == null
-        )
-            return LinkedList()
-        return rulesContainer[mock]?.get(method) as List<Rule<T>>
     }
 
     fun logInvocation(methodInvocation: MethodInvocation) {

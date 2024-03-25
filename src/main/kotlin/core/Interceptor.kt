@@ -1,5 +1,7 @@
 package core
 
+import core.data.MethodInvocation
+import core.data.MockInfoBase
 import core.matching.Rule
 import mu.KotlinLogging
 import net.bytebuddy.implementation.bind.annotation.AllArguments
@@ -22,30 +24,21 @@ class Interceptor {
             @AllArguments arguments: Array<Any?>
         ): Any? {
             MockInfoBase.getInstance().logInvocation(MethodInvocation(mock, invokedMethod, arguments))
-            val rules: List<Rule<Any>> = MockInfoBase.getInstance().getRules(mock, invokedMethod)
+            val rules: List<Rule<Any>> = MockInfoBase.getInstance().rules.getRules(mock, invokedMethod)
             logger.debug {
-                "${invokedMethod.name}(...)\n" +
+                "Checking rules for: ${invokedMethod.name}(...)\n" +
                         "Rules: $rules"
             }
             for (rule in rules) {
                 if (rule.apply(arguments)) {
-                    logger.debug { "Rule applied - returned ${rule.result()}" }
+                    logger.info { "Rule applied - returned ${rule.result()}" }
                     return rule.result()
                 }
             }
+            logger.info { "Valid rules not found - returned default value" }
             return getDefaultValue(invokedMethod.returnType)
         }
 
-        private fun getDefaultValue(clazz: Class<*>): Any? {
-            if (!clazz.isPrimitive) {
-                return null
-            }
-            return when (clazz.name) {
-                "boolean" -> false
-                "byte", "char", "short", "int", "long", "float", "double" -> 0
-                else -> null
-            }
-        }
     }
 
 }
