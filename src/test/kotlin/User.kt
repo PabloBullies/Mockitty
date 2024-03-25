@@ -14,8 +14,10 @@ open class User(private val username: String) {
 
     companion object {
         fun staticMethod(): String {
-            println("STATIC")
             return "STATIC"
+        }
+        fun countAge(year: Int): Int{
+            return 2024 - year
         }
     }
 }

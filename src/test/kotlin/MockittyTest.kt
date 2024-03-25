@@ -26,11 +26,22 @@ class MockittyTest {
 
     @Test
     fun testStatic() {
+        assertEquals(User.staticMethod(), "STATIC")
         Mockitty.mock<User.Companion>("staticMethod")
         assertNull(User.staticMethod())
         Mockitty.every { User.staticMethod() } returns { "static" }
-        val value = User.staticMethod()
-        assertEquals(value, "static")
+        assertEquals(User.staticMethod(), "static")
+
+
+        assertEquals(User.countAge(2003),21)
+        Mockitty.mock<User.Companion>("countAge")
+        assertEquals(User.countAge(2003),0)
+        Mockitty.every { User.countAge(any()) } returns { 1984 }
+        assertEquals(User.countAge(2003), 1984)
+        assertEquals(User.countAge(2024), 1984)
+        assertEquals(User.countAge(1984), 1984)
+
+
     }
 
     @Test
