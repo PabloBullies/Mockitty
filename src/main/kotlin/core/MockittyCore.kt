@@ -55,10 +55,10 @@ class MockittyCore {
         MockInfoBase.getInstance().clearMatchers()
         term.everyBlock()
         logger.debug { "End: everyBlock. Getting invocation" }
-        val invocation = MockInfoBase.getInstance().getLastInvocation()
+        val invocation = MockInfoBase.getInstance().invocationContainer.peekFirst()
         var matchers: List<(Any?) -> Boolean> = MockInfoBase.getInstance().getMatchers()
 
-        if ((matchers.isNotEmpty()) and (matchers.size != invocation.arguments.size)) {
+        if ((matchers.isNotEmpty()) and (matchers.size != invocation.arguments!!.size)) {
             logger.error { "IllegalArgumentException: Matcher length must be equal arguments length or 0" }
             throw IllegalArgumentException("Matcher length must be equal arguments length or 0")
         }
@@ -70,12 +70,12 @@ class MockittyCore {
             matchers = argMatchers
         }
         logger.info {
-            "Invocation getted: ${invocation.invokedMethod.name}" +
+            "Invocation getted: ${invocation.invokedMethod!!.name}" +
                     "(${invocation.arguments.joinToString { it?.toString() ?: "null" }})\n" +
                     "Matchers: $matchers"
         }
         val rule = Rule(matchers, term.returnsBlock)
-        MockInfoBase.getInstance().rules.addRule(invocation.mock, invocation.invokedMethod, rule)
+        MockInfoBase.getInstance().rules.addRule(invocation.mock, invocation.invokedMethod!!, rule)
     }
 
     private fun <T> createObjectByType(mock: Class<out T>): T {

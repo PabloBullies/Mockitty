@@ -7,7 +7,7 @@ class MockInfoBase {
 
     val rules: RulesContainer = RulesContainer()
     val spy: IdentityHashMap<Any, Any> = IdentityHashMap()
-    private val invocationContainer: LinkedBlockingDeque<MethodInvocation> = LinkedBlockingDeque()
+    val invocationContainer: InvocationContainer = InvocationContainer()
     private val matchersInvocationContainer: LinkedBlockingDeque<(Any?) -> Boolean> = LinkedBlockingDeque()
 
     companion object {
@@ -22,18 +22,6 @@ class MockInfoBase {
             }
             return INSTANCE!!
         }
-    }
-
-    fun logInvocation(methodInvocation: MethodInvocation) {
-        invocationContainer.addFirst(methodInvocation)
-        if (invocationContainer.size > 10) {
-            invocationContainer.removeLast()
-        }
-    }
-
-    @Throws(InterruptedException::class)
-    fun getLastInvocation(): MethodInvocation {
-        return invocationContainer.takeFirst()
     }
 
     @Suppress("UNCHECKED_CAST")

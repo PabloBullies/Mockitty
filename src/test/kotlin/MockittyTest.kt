@@ -1,25 +1,28 @@
-
 import Mockitty.Companion.returns
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import core.verify.VerificationFailedException
 import mu.KLogger
 import mu.KotlinLogging
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.slf4j.LoggerFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class MockittyTest {
-    companion object{
-        private fun setLogger(logLevel: Level): KLogger{
+    companion object {
+        private fun setLogger(logLevel: Level): KLogger {
             val context = LoggerFactory.getILoggerFactory() as LoggerContext
 
             val rootLogger = context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
             rootLogger.level = logLevel
-            val logger = KotlinLogging.logger{}
+            val logger = KotlinLogging.logger {}
             logger.info { "========= Start logging =========" }
             return logger
         }
+
         val logger = setLogger(Level.ERROR)
     }
 
@@ -52,9 +55,9 @@ class MockittyTest {
         assertEquals(User.staticMethod(), "static")
 
 
-        assertEquals(User.countAge(2003),21)
+        assertEquals(User.countAge(2003), 21)
         Mockitty.mock<User.Companion>("countAge")
-        assertEquals(User.countAge(2003),0)
+        assertEquals(User.countAge(2003), 0)
         Mockitty.every { User.countAge(any()) } returns { 1984 }
         assertEquals(User.countAge(2003), 1984)
         assertEquals(User.countAge(2024), 1984)
@@ -81,12 +84,48 @@ class MockittyTest {
     }
 
     @Test
-    fun testSpy(){
+    fun testSpy() {
         val user1 = User("Ken")
         val user2 = User("Barbie")
         val spyUser = Mockitty.spy(user1)
-        spyUser.hello()
         spyUser.addFriend(user2)
         spyUser.readFriendList()
+        assertFailsWith<VerificationFailedException> {
+            verify { spyUser.hello() }
+        }
+        spyUser.hello()
+        assertDoesNotThrow {
+            verify { spyUser.hello() }
+        }
+        assertDoesNotThrow {
+            verify(exactly = 1) {
+                spyUser.hello()
+            }
+        }
+        assertDoesNotThrow {
+            verify(1, 2) {
+                spyUser.hello()
+            }
+        }
+        assertFailsWith<VerificationFailedException> {
+            verify(0, 0) {
+                spyUser.hello()
+            }
+        }
+        spyUser.hello()
+        spyUser.readFriendList()
+        assertDoesNotThrow {
+            verifySeq {
+                spyUser.hello()
+                spyUser.readFriendList()
+            }
+        }
+        assertFailsWith<VerificationFailedException> {
+            verifySeq {
+                spyUser.readFriendList()
+                spyUser.hello()
+            }
+        }
+
     }
 }

@@ -29,7 +29,7 @@ public class StaticInterceptor {
             @Advice.AllArguments Object[] arguments,
             @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value
     ) {
-        MockInfoBase.getInstance().logInvocation(new MethodInvocation(null, invokedMethod, arguments));
+        MockInfoBase.getInstance().getInvocationContainer().addFirst(new MethodInvocation(null, invokedMethod, arguments));
         List<Rule<Object>> rules = MockInfoBase.getInstance().getRules().getRules(null, invokedMethod);
         for (Rule<Object> rule : rules) {
             if (rule.apply(Arrays.stream(arguments).toArray())) {
