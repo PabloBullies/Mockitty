@@ -1,5 +1,6 @@
 package core.intercept
 
+import core.data.MethodInvocation
 import core.data.MockInfoBase
 import mu.KotlinLogging
 import net.bytebuddy.implementation.bind.annotation.AllArguments
@@ -20,7 +21,8 @@ class SpyInterceptor : Interceptor {
             @Origin invokedMethod: Method,
             @AllArguments arguments: Array<Any?>
         ): Any? {
-            logger.debug {  "spy ${invokedMethod.name}([${arguments.size}])" }
+            MockInfoBase.getInstance().invocationContainer.addFirst(MethodInvocation(mock, invokedMethod, arguments))
+            logger.debug { "spy ${invokedMethod.name}([${arguments.size}])" }
             val objectForSpy = MockInfoBase.getInstance().spy[mock]
             return invokedMethod(objectForSpy!!, *arguments)
         }

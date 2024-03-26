@@ -11,18 +11,21 @@ open class User(private val username: String) {
         friendList.add(friend)
         return friend.friendList.contains(this)
     }
-    open fun readFriendList(){
+
+    open fun readFriendList() {
         println("${getName()}'s FriendList: ")
-        for (friend in friendList){
+        for (friend in friendList) {
             println(friend.getName())
         }
     }
+
 
     companion object {
         fun staticMethod(): String {
             return "STATIC"
         }
-        fun countAge(year: Int): Int{
+
+        fun countAge(year: Int): Int {
             return 2024 - year
         }
     }

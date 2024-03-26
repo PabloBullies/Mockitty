@@ -24,7 +24,7 @@ class MockInterceptor : Interceptor {
             @Origin invokedMethod: Method,
             @AllArguments arguments: Array<Any?>
         ): Any? {
-            MockInfoBase.getInstance().logInvocation(MethodInvocation(mock, invokedMethod, arguments))
+            MockInfoBase.getInstance().invocationContainer.addFirst(MethodInvocation(mock, invokedMethod, arguments))
             val rules: List<Rule<Any>> = MockInfoBase.getInstance().rules.getRules(mock, invokedMethod)
             logger.debug {
                 "Checking rules for: ${invokedMethod.name}(...)\n" +
