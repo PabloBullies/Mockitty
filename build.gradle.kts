@@ -12,7 +12,6 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta")
     implementation("net.bytebuddy:byte-buddy:1.14.12")
     implementation("net.bytebuddy:byte-buddy-agent:1.14.12")
     implementation("org.objenesis:objenesis:3.3")
