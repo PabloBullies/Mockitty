@@ -2,6 +2,8 @@ package core
 
 import Term
 import core.data.MockInfoBase
+import core.intercept.MockInterceptor
+import core.intercept.SpyInterceptor
 import core.matching.Rule
 import mu.KotlinLogging
 import net.bytebuddy.ByteBuddy
@@ -23,7 +25,7 @@ class MockittyCore {
         val mock = ByteBuddy()
             .subclass(classToMock)
             .method(any())
-            .intercept(MethodDelegation.to(Interceptor::class.java))
+            .intercept(MethodDelegation.to(MockInterceptor::class.java))
             .make()
             .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
             .loaded
@@ -40,6 +42,23 @@ class MockittyCore {
             .visit(Advice.to(StaticInterceptor::class.java).on(ElementMatchers.named(method)))
             .make()
             .load(javaClass.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent())
+    }
+
+    fun <T> spy(objectForSpy: T, objectClass: Class<T>): T {
+        logger.info { "===Spying===" }
+        ByteBuddyAgent.install()
+        val mock = ByteBuddy()
+            .subclass(objectClass)
+            .method(any())
+            .intercept(MethodDelegation.to(SpyInterceptor::class.java))
+            .make()
+            .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+            .loaded
+
+        val objenesis = ObjenesisStd()
+        val spyObject: T = objenesis.newInstance(mock)
+        MockInfoBase.getInstance().spy[spyObject] = objectForSpy
+        return spyObject
     }
 
     fun <T> makeRule(term: Term<T>) {
@@ -70,5 +89,4 @@ class MockittyCore {
         val rule = Rule(matchers, term.returnsBlock)
         MockInfoBase.getInstance().rules.addRule(invocation.mock, invocation.invokedMethod, rule)
     }
-
 }

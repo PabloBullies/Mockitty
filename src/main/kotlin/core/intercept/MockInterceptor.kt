@@ -1,27 +1,27 @@
-package core
+package core.intercept
 
 import core.data.MethodInvocation
 import core.data.MockInfoBase
+import core.getDefaultValue
 import core.matching.Rule
 import mu.KotlinLogging
-import net.bytebuddy.implementation.bind.annotation.AllArguments
-import net.bytebuddy.implementation.bind.annotation.Origin
-import net.bytebuddy.implementation.bind.annotation.RuntimeType
-import net.bytebuddy.implementation.bind.annotation.This
+import net.bytebuddy.implementation.bind.annotation.*
 import java.lang.reflect.Method
+import java.util.concurrent.Callable
 
-class Interceptor {
+class MockInterceptor: Interceptor {
 
-    companion object {
+    companion object: Interceptor.InterceptorCompanion {
 
         private val logger = KotlinLogging.logger {}
 
         @RuntimeType
         @JvmStatic
-        fun intercept(
+        override fun intercept(
             @This mock: Any,
             @Origin invokedMethod: Method,
-            @AllArguments arguments: Array<Any?>
+            @AllArguments arguments: Array<Any?>,
+            @SuperCall callable: Callable<*>
         ): Any? {
             MockInfoBase.getInstance().logInvocation(MethodInvocation(mock, invokedMethod, arguments))
             val rules: List<Rule<Any>> = MockInfoBase.getInstance().rules.getRules(mock, invokedMethod)

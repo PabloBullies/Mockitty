@@ -2,7 +2,7 @@ open class User(private val username: String) {
     private val friendList: ArrayList<User> = ArrayList()
 
     open fun hello() {
-        println("Hello!")
+        println("Hello, $username!")
     }
 
     open fun add(x: Int, y: Int): Int = x + y
@@ -10,6 +10,12 @@ open class User(private val username: String) {
     open fun addFriend(friend: User): Boolean {
         friendList.add(friend)
         return friend.friendList.contains(this)
+    }
+    open fun readFriendList(){
+        println("${getName()}'s FriendList: ")
+        for (friend in friendList){
+            println(friend.getName())
+        }
     }
 
     companion object {

@@ -40,8 +40,6 @@ class MockittyTest {
         assertEquals(User.countAge(2003), 1984)
         assertEquals(User.countAge(2024), 1984)
         assertEquals(User.countAge(1984), 1984)
-
-
     }
 
     @Test
@@ -61,5 +59,15 @@ class MockittyTest {
         assertEquals(user.add(3, 2), 10)
         assertEquals(user.add(1, 1), 2)
         assertEquals(user.add(1, 0), 0)
+    }
+
+    @Test
+    fun testSpy(){
+        val user1 = User("Ken")
+        val user2 = User("Barbie")
+        val spyuser = Mockitty.spy(user1)
+        spyuser.hello()
+        spyuser.addFriend(user2)
+        spyuser.readFriendList()
     }
 }

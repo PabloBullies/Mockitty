@@ -21,5 +21,9 @@ class Mockitty {
             val term: Term<T> = this.build()
             MOCKITTY_CORE.makeRule(term)
         }
+
+        inline fun <reified T> spy(spyObject: T): T {
+            return MOCKITTY_CORE.spy(spyObject, T::class.java)
+        }
     }
 }

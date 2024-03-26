@@ -6,9 +6,9 @@ import java.util.concurrent.LinkedBlockingDeque
 class MockInfoBase {
 
     val rules: RulesContainer = RulesContainer()
+    val spy: IdentityHashMap<Any, Any> = IdentityHashMap()
     private val invocationContainer: LinkedBlockingDeque<MethodInvocation> = LinkedBlockingDeque()
     private val matchersInvocationContainer: LinkedBlockingDeque<(Any?) -> Boolean> = LinkedBlockingDeque()
-
     companion object {
         @Volatile
         @JvmStatic
