@@ -2,6 +2,7 @@ package core
 
 import Term
 import core.data.MockInfoBase
+import core.intercept.Interceptor
 import core.intercept.MockInterceptor
 import core.intercept.SpyInterceptor
 import core.matching.Rule
@@ -22,16 +23,19 @@ class MockittyCore {
     fun <T> mock(classToMock: Class<T>): T {
         logger.info { "===Mocking===" }
         ByteBuddyAgent.install()
-        val mock = ByteBuddy()
-            .subclass(classToMock)
-            .method(any())
-            .intercept(MethodDelegation.to(MockInterceptor::class.java))
-            .make()
-            .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
-            .loaded
+        val mock = makeInterceptableType(classToMock, MockInterceptor::class.java)
         val objenesis = ObjenesisStd()
         val result: T = objenesis.newInstance(mock)
         return result
+    }
+
+    fun <T> spy(objectForSpy: T, objectClass: Class<T>): T {
+        logger.info { "===Spying===" }
+        ByteBuddyAgent.install()
+        val mock = makeInterceptableType(objectClass, SpyInterceptor::class.java)
+        val spyObject: T = createObjectByType(mock)
+        MockInfoBase.getInstance().spy[spyObject] = objectForSpy
+        return spyObject
     }
 
     fun <T> mockStaticMethod(targetClass: Class<T>, method: String) {
@@ -44,22 +48,6 @@ class MockittyCore {
             .load(javaClass.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent())
     }
 
-    fun <T> spy(objectForSpy: T, objectClass: Class<T>): T {
-        logger.info { "===Spying===" }
-        ByteBuddyAgent.install()
-        val mock = ByteBuddy()
-            .subclass(objectClass)
-            .method(any())
-            .intercept(MethodDelegation.to(SpyInterceptor::class.java))
-            .make()
-            .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
-            .loaded
-
-        val objenesis = ObjenesisStd()
-        val spyObject: T = objenesis.newInstance(mock)
-        MockInfoBase.getInstance().spy[spyObject] = objectForSpy
-        return spyObject
-    }
 
     fun <T> makeRule(term: Term<T>) {
         logger.info { "===Making Rule===" }
@@ -89,4 +77,21 @@ class MockittyCore {
         val rule = Rule(matchers, term.returnsBlock)
         MockInfoBase.getInstance().rules.addRule(invocation.mock, invocation.invokedMethod, rule)
     }
+
+    private fun <T> createObjectByType(mock: Class<out T>): T {
+        val objenesis = ObjenesisStd()
+        val spyObject: T = objenesis.newInstance(mock)
+        return spyObject
+    }
+
+    private fun <T> makeInterceptableType(
+        objectClass: Class<T>,
+        interceptorClass: Class<out Interceptor>
+    ): Class<out T> = ByteBuddy()
+        .subclass(objectClass)
+        .method(any())
+        .intercept(MethodDelegation.to(interceptorClass))
+        .make()
+        .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+        .loaded
 }

@@ -1,9 +1,28 @@
+
 import Mockitty.Companion.returns
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.LoggerContext
+import mu.KLogger
+import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class MockittyTest {
+    companion object{
+        private fun setLogger(logLevel: Level): KLogger{
+            val context = LoggerFactory.getILoggerFactory() as LoggerContext
+
+            val rootLogger = context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)
+            rootLogger.level = logLevel
+            val logger = KotlinLogging.logger{}
+            logger.info { "========= Start logging =========" }
+            return logger
+        }
+        val logger = setLogger(Level.ERROR)
+    }
+
 
     @Test
     fun testEveryReturns() {
@@ -65,9 +84,9 @@ class MockittyTest {
     fun testSpy(){
         val user1 = User("Ken")
         val user2 = User("Barbie")
-        val spyuser = Mockitty.spy(user1)
-        spyuser.hello()
-        spyuser.addFriend(user2)
-        spyuser.readFriendList()
+        val spyUser = Mockitty.spy(user1)
+        spyUser.hello()
+        spyUser.addFriend(user2)
+        spyUser.readFriendList()
     }
 }
