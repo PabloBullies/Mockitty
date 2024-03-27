@@ -1,4 +1,5 @@
 import core.MockittyCore
+import kotlin.reflect.KFunction
 
 class Mockitty {
     companion object {
@@ -11,8 +12,8 @@ class Mockitty {
             return MOCKITTY_CORE.mock(clazz, clazz.classLoader)
         }
 
-        inline fun <reified T> mock(method: String) {
-            MOCKITTY_CORE.mockStaticMethod(T::class.java, method)
+        inline fun <reified T> mock(method: KFunction<*>) {
+            MOCKITTY_CORE.mockStaticMethod(T::class.java, method.name)
         }
 
 

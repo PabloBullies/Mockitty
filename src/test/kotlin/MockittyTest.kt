@@ -2,6 +2,7 @@
 import Mockitty.Companion.returns
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import core.matching.match
 import core.verify.VerificationFailedException
 import mu.KLogger
 import mu.KotlinLogging
@@ -60,14 +61,14 @@ class MockittyTest {
     @Test
     fun testStatic() {
         assertEquals(User.staticMethod(), "STATIC")
-        Mockitty.mock<User.Companion>("staticMethod")
+        Mockitty.mock<User.Companion>(User.Companion::staticMethod)
         assertNull(User.staticMethod())
         Mockitty.every { User.staticMethod() } returns { "static" }
         assertEquals(User.staticMethod(), "static")
 
 
         assertEquals(User.countAge(2003), 21)
-        Mockitty.mock<User.Companion>("countAge")
+        Mockitty.mock<User.Companion>(User.Companion::countAge)
         assertEquals(User.countAge(2003), 0)
         Mockitty.every { User.countAge(any()) } returns { 1984 }
         assertEquals(User.countAge(2003), 1984)
@@ -86,7 +87,7 @@ class MockittyTest {
         assertEquals(user.add(1, 1), 2)
         assertEquals(user.add(1, 2), 0)
 
-        Mockitty.every { user.add(any(), eq(2)) } returns { 10 }
+        Mockitty.every { user.add(match{true}, eq(2)) } returns { 10 }
         assertEquals(user.add(1, 2), 10)
         assertEquals(user.add(2, 2), 10)
         assertEquals(user.add(3, 2), 10)
