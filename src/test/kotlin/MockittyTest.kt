@@ -1,3 +1,4 @@
+
 import Mockitty.Companion.returns
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
@@ -6,6 +7,8 @@ import mu.KLogger
 import mu.KotlinLogging
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.net.URLClassLoader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -44,6 +47,14 @@ class MockittyTest {
         Mockitty.every { user.add(1, 1) } returns { 3 }
         assertEquals(3, user.add(1, 1))
         assertEquals(0, user.add(2, 2))
+    }
+
+    @Test
+    fun testClassLoader() {
+        val classLoader = URLClassLoader(arrayOf(File("test.jar").toURI().toURL()))
+        val loadClass = classLoader.loadClass("Bean")
+        val mock = Mockitty.mock(loadClass)
+        assertNull(mock.toString())
     }
 
     @Test

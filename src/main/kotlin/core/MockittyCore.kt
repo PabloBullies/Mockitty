@@ -20,10 +20,10 @@ import org.objenesis.ObjenesisStd
 
 class MockittyCore {
     private val logger = KotlinLogging.logger {}
-    fun <T> mock(classToMock: Class<T>): T {
+    fun <T> mock(classToMock: Class<T>, classLoader: ClassLoader): T {
         logger.info { "===Mocking===" }
         ByteBuddyAgent.install()
-        val mock = makeInterceptableType(classToMock, MockInterceptor::class.java)
+        val mock = makeInterceptableType(classToMock, MockInterceptor::class.java, classLoader)
         val objenesis = ObjenesisStd()
         val result: T = objenesis.newInstance(mock)
         return result
@@ -32,7 +32,7 @@ class MockittyCore {
     fun <T> spy(objectForSpy: T, objectClass: Class<T>): T {
         logger.info { "===Spying===" }
         ByteBuddyAgent.install()
-        val mock = makeInterceptableType(objectClass, SpyInterceptor::class.java)
+        val mock = makeInterceptableType(objectClass, SpyInterceptor::class.java, javaClass.classLoader)
         val spyObject: T = createObjectByType(mock)
         MockInfoBase.getInstance().spy[spyObject] = objectForSpy
         return spyObject
@@ -86,12 +86,13 @@ class MockittyCore {
 
     private fun <T> makeInterceptableType(
         objectClass: Class<T>,
-        interceptorClass: Class<out Interceptor>
+        interceptorClass: Class<out Interceptor>,
+        classLoader: ClassLoader
     ): Class<out T> = ByteBuddy()
         .subclass(objectClass)
         .method(any())
         .intercept(MethodDelegation.to(interceptorClass))
         .make()
-        .load(javaClass.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+        .load(classLoader, ClassLoadingStrategy.Default.WRAPPER)
         .loaded
 }

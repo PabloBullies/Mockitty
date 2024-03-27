@@ -4,7 +4,11 @@ class Mockitty {
     companion object {
         val MOCKITTY_CORE = MockittyCore()
         inline fun <reified T> mock(): T {
-            return MOCKITTY_CORE.mock(T::class.java)
+            return MOCKITTY_CORE.mock(T::class.java, javaClass.classLoader)
+        }
+
+        fun <T> mock(clazz: Class<T>): T {
+            return MOCKITTY_CORE.mock(clazz, clazz.classLoader)
         }
 
         inline fun <reified T> mock(method: String) {
