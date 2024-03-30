@@ -5,12 +5,18 @@ import java.util.stream.IntStream.range
 private fun countInvocations(verifyBlock: () -> Any?): Int {
     val invocations = getVerifyInvocations(verifyBlock)
     val checkingPart = invocations.second.size - invocations.first.size
-    if (checkingPart != 1) throw VerificationFailedException("This verify block must contains only 1 method invocation")
     val beforeVerifyBlockInvocations = invocations.first
     val afterVerifyBlockInvocations = invocations.second.subList(0, checkingPart)
+    var pivot = 0
     var result = 0
     for (i in range(0, beforeVerifyBlockInvocations.size)) {
-        if (beforeVerifyBlockInvocations[i].hashCode() == afterVerifyBlockInvocations[0].hashCode()) result++
+        if (beforeVerifyBlockInvocations[i].hashCode() == afterVerifyBlockInvocations[pivot].hashCode()) {
+            if (pivot + 1 == checkingPart){
+                pivot=0
+                result++
+            }
+            else pivot++
+        }
     }
     return result
 }

@@ -10,14 +10,14 @@ fun getVerifyInvocations(verifyBlock: () -> Any?): Pair<List<MethodInvocation>, 
     val afterVerifyBlockInvocations = ArrayList(MockInfoBase.getInstance().invocationContainer.toList())
 
     var info = "\nBefore Invocation:\n"
-    for ((i, invocation) in afterVerifyBlockInvocations.withIndex())
+    for ((i, invocation) in beforeVerifyBlockInvocations.reversed().withIndex())
         info += "${i}:  ${invocation.invokedMethod!!.declaringClass}().${invocation.invokedMethod.name}(${
             invocation.arguments!!.joinToString(
                 separator = ", "
             )
         })\n"
     info += "After Invocation:\n"
-    for ((i, invocation) in beforeVerifyBlockInvocations.withIndex())
+    for ((i, invocation) in afterVerifyBlockInvocations.reversed().withIndex())
         info += "${i}:  ${invocation.invokedMethod!!.declaringClass}().${invocation.invokedMethod.name}(${
             invocation.arguments!!.joinToString(
                 separator = ", "

@@ -44,8 +44,7 @@ class ExampleTest {
         } returns { listOf(1, 2, 3, 4, 5) }
 
         assertEquals(1, database[0])
-
-        verify(exactly = 1) {
+        verify(exactly = 2) {
             database[0]
         }
 
