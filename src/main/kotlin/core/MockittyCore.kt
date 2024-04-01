@@ -39,7 +39,6 @@ class MockittyCore {
     }
 
     fun <T> mockStaticMethod(targetClass: Class<T>, method: String) {
-        logger.info { "===StaticMocking===" }
         ByteBuddyAgent.install()
         ByteBuddy()
             .redefine(targetClass)

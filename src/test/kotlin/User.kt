@@ -7,15 +7,22 @@ open class User(private val username: String) {
 
     open fun add(x: Int, y: Int): Int = x + y
     open fun getName(): String = username
-    open fun addFriend(friend: User): Boolean {
+    open fun addFriend(friend: User) {
         friendList.add(friend)
-        return friend.friendList.contains(this)
     }
 
-    open fun readFriendList() {
+    open fun showFriendList() {
         println("${getName()}'s FriendList: ")
         for (friend in friendList) {
             println(friend.getName())
+            friend.hello()
+        }
+    }
+
+    open fun makeFriendsSayHello() {
+        for (friend in friendList) {
+            println(friend.getName())
+            friend.hello()
         }
     }
 
